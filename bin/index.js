@@ -10,7 +10,7 @@ const KEY = process.env.API_KEY;
 const provider = new ethers.providers.EtherscanProvider("rinkeby", KEY);
 
 const options = yargs
- .usage("Usage: -f <from> -t <to> -a <amount>  (Wallets IDs must be written in this format: #1, #2)")
+ .usage("Usage: -f <from> -t <to> -a <amount>  (Wallets IDs must be written in this format: #1, #2). CSV file must be named 'Wallets.csv'")
  .option("f", { alias: "from", describe: "ID of the source for the transfer", type: "string", demandOption: true })
  .option("t", { alias: "to", describe: "ID of the recipient for the transfer", type: "string", demandOption: true })
  .option("a", { alias: "amount", describe: "Amount of Eth to be transfered", type: "string", demandOption: true })
