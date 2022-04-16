@@ -19,42 +19,40 @@ const options = yargs
 var fromID = options.from.split('#')[1] - 1;
 var toID = options.to.split('#')[1] - 1;
 
-var Wallets = []
 var signingWallet;
 var tx;
+var Wallets = [];
 
-
-let importWallets = () => {
-  fs.createReadStream('Wallets.csv')
-    .pipe(csv())
-    .on('data', (row) => {
-      Wallets.push(row);
-    })
-    .on("end", () => {
-      console.log('finished');
-    })
+let importWallets = async () => {
+  let foo = [];
+  return new Promise( (resolve, reject) => {
+    fs.createReadStream('Wallets.csv')
+      .pipe(csv())
+      .on('data', (row) => {
+         foo.push(row);
+       })
+       .on("end", () => {
+         console.log('finished');
+         resolve(foo);       
+       })
+  })
 }
 
-let app = () => {
-  signingWallet = new ethers.Wallet(Wallets[fromID].PrivateKey, provider);
-  let address = Wallets[toID].Address;
-  tx = {
-    to: address,
-    value: ethers.utils.parseEther(options.amount)
-  }
-}
-
-let transaction = async () => {
+let app = async () => {
   try{
+    Wallets = await importWallets();
+    signingWallet = new ethers.Wallet(Wallets[fromID].PrivateKey, provider);
+    let address = Wallets[toID].Address;
+    tx = {
+      to: address,
+      value: ethers.utils.parseEther(options.amount)
+    }
     let trx = await signingWallet.sendTransaction(tx);
     console.log(trx.hash);
+    
   }catch(error){
     console.log(error);
   }
 }
 
-importWallets()
-setTimeout(() => {
-  app();
-  transaction()
-}, 1000);
+app()
